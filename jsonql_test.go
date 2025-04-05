@@ -1,6 +1,7 @@
 package jsonql
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -68,4 +69,40 @@ func TestParse(t *testing.T) {
 	for range fail {
 
 	}
+}
+
+func TestPrepare(t *testing.T) {
+	jsStr := `[{"name":"dogman","job":"police"},{"name":"chief","job":"police"}]`
+
+	query := "job = 'police' && name != 'dogman'"
+
+	pq, err := Prepare(query)
+	if err != nil {
+		t.Errorf("failed to prepare query: %s", err)
+		return
+	}
+
+	var obj []any
+	err = json.Unmarshal([]byte(jsStr), &obj)
+	if err != nil {
+		t.Errorf("failed to unmarshal json: %s", err)
+		return
+	}
+
+	rez, err := pq.Query(obj)
+	if err != nil {
+		t.Errorf("failed to run query: %s", err)
+		return
+	}
+	fmt.Printf("%+v\n", rez)
+	return
+	/*
+		if m, ok := rez.(map[string]string); ok {
+			if m["name"] != "chief" {
+				t.Errorf("expected chief, got %s", m["name"])
+			}
+		} else {
+			t.Errorf("failed to cast result")
+		}
+	*/
 }
