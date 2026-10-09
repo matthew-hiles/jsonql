@@ -136,10 +136,16 @@ var sqlOperators = map[string]*Operator{
 		Eval: func(symbolTable interface{}, left string, right string) (string, error) {
 			l, err := evalToken(symbolTable, left)
 			if err != nil {
+				if strings.Contains(err.Error(), "does not exist.") {
+					return "false", nil
+				}
 				return "false", err
 			}
 			r, err := evalToken(symbolTable, right)
 			if err != nil {
+				if strings.Contains(err.Error(), "does not exist.") {
+					return "false", nil
+				}
 				return "false", err
 			}
 			// fmt.Println(reflect.TypeOf(l).String())
